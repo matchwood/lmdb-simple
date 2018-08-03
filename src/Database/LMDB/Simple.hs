@@ -50,6 +50,7 @@ module Database.LMDB.Simple
   , Limits (..)
   , defaultLimits
   , openEnvironment
+  , closeEnvironment
   , openReadWriteEnvironment
   , openReadOnlyEnvironment
   , readOnlyEnvironment
@@ -105,6 +106,7 @@ import Database.LMDB.Raw
   , MDB_DbFlag (MDB_CREATE)
   , mdb_env_create
   , mdb_env_open
+  , mdb_env_close
   , mdb_env_set_mapsize
   , mdb_env_set_maxdbs
   , mdb_env_set_maxreaders
@@ -205,6 +207,10 @@ openEnvironment path limits = do
         isNotDirectoryError LMDB_Error { e_code = Left code }
           | Errno (fromIntegral code) == eNOTDIR = True
         isNotDirectoryError _                    = False
+
+closeEnvironment :: Environment mode -> IO ()
+closeEnvironment (Env env) = mdb_env_close env
+
 
 -- | Convenience function for opening an LMDB environment in 'ReadWrite'
 -- mode; see 'openEnvironment'
